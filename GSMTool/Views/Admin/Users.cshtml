@@ -1,0 +1,107 @@
+﻿@model IEnumerable<GSMTool.Models.User>
+
+@{
+    ViewData["Title"] = "Zarządzanie użytkownikami";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Zarządzanie użytkownikami</h2>
+    <a asp-action="CreateUser" class="btn btn-primary">Dodaj użytkownika</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nazwa użytkownika</th>
+                <th>Email</th>
+                <th>Rola</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.Username</td>
+                    <td>@item.Email</td>
+                    <td>
+                        <select class="form-select role-select" data-user-id="@item.Id">
+                            @{
+                                var roles = new[] { "User", "Administrator" };
+                                foreach (var role in roles)
+                                {
+                                    if (role == item.Role)
+                                    {
+                                        <option value="@role" selected>@(role == "User" ? "Użytkownik" : "Administrator")</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@role">@(role == "User" ? "Użytkownik" : "Administrator")</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </td>
+                    <td>
+                        <button class="btn btn-success btn-sm me-2 save-role" data-user-id="@item.Id">
+                            Zapisz rolę
+                        </button>
+                        <form asp-action="DeleteUser" method="post" style="display: inline">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Czy na pewno chcesz usunąć tego użytkownika?')">
+                                Usuń
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('.save-role').click(function () {
+                const userId = $(this).data('user-id');
+                const newRole = $(this).closest('tr').find('.role-select').val();
+                const button = $(this);
+
+                button.prop('disabled', true).text('Zapisywanie...');
+
+                $.ajax({
+                    url: '@Url.Action("UpdateRole", "Admin")',
+                    type: 'POST',
+                    data: {
+                        userId: userId,
+                        role: newRole
+                    },
+                    success: function (response) {
+                        if (response.success) {
+                            const alertHtml = '<div class="alert alert-success alert-dismissible fade show" role="alert">' +
+                                'Rola została zaktualizowana pomyślnie.' +
+                                '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>' +
+                                '</div>';
+
+                            $('.table-responsive').before(alertHtml);
+
+                            setTimeout(function () {
+                                $('.alert').alert('close');
+                            }, 3000);
+                        } else {
+                            alert('Wystąpił błąd podczas aktualizacji roli.');
+                        }
+                    },
+                    error: function () {
+                        alert('Wystąpił błąd podczas połączenia z serwerem.');
+                    },
+                    complete: function () {
+                        button.prop('disabled', false).text('Zapisz rolę');
+                    }
+                });
+            });
+        });
+    </script>
+}

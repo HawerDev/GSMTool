@@ -1,0 +1,170 @@
+﻿@model GSMTool.Models.Device
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Zlecenie serwisowe #@Model.ServiceNumber</title>
+    <style type="text/css">
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .order-details {
+            margin-bottom: 30px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .terms {
+            font-size: 12px;
+            margin-top: 40px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .signatures {
+            margin-top: 50px;
+        }
+
+        .signature-line {
+            text-align: center;
+            padding-top: 30px;
+            width: 50%;
+        }
+
+        @@media print {
+            .no-print {
+                display: none;
+            }
+
+            body {
+                margin: 0;
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">ITronik Serwis</div>
+        <div>ul. Piekary 15, 64-800 Chodzież</div>
+        <div>Tel: +48 570 442 110</div>
+    </div>
+
+    <h2>Zlecenie serwisowe #@Model.ServiceNumber</h2>
+
+    <div class="order-details">
+        <table>
+            <tr>
+                <th style="width: 200px;">Data przyjęcia:</th>
+                <td>@Model.CreatedDate.ToString("dd.MM.yyyy HH:mm")</td>
+            </tr>
+            <tr>
+                <th>Status:</th>
+                <td>@Model.Status</td>
+            </tr>
+            <tr>
+                <th>Model urządzenia:</th>
+                <td>@Model.Model</td>
+            </tr>
+            <tr>
+                <th>Numer IMEI:</th>
+                <td>@Model.IMEINumber</td>
+            </tr>
+            <tr>
+                <th>Klient:</th>
+                <td>@Model.CustomerName</td>
+            </tr>
+            <tr>
+                <th>Telefon:</th>
+                <td>@Model.CustomerPhone</td>
+            </tr>
+            <tr>
+                <th>Opis usterki:</th>
+                <td>@(string.IsNullOrEmpty(Model.Description) ? "Brak opisu" : Model.Description)</td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="terms">
+        <h3>Regulamin serwisu:</h3>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+
+        <p>Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+
+    </div>
+
+    <div class="signatures">
+        <table style="border: none;">
+            <tr>
+                <td class="signature-line" style="border: none;">
+                    ...............................
+                    <br />
+                    Podpis klienta
+                </td>
+                <td class="signature-line" style="border: none;">
+                    ...............................
+                    <br />
+                    Podpis serwisanta
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="no-print" style="margin-top: 20px; text-align: center;">
+        <button onclick="window.print()" style="padding: 10px 20px; margin: 5px; cursor: pointer;">Drukuj</button>
+        <button onclick="window.close()" style="padding: 10px 20px; margin: 5px; cursor: pointer;">Zamknij</button>
+    </div>
+
+    <script>
+       
+            // Automatyczne wywołanie drukowania po załadowaniu strony
+            document.addEventListener('DOMContentLoaded', function() {
+                // Małe opóźnienie, aby strona zdążyła się wyrenderować
+                setTimeout(function () {
+                    window.print();
+                }, 500);
+            });
+
+            // Nasłuchiwanie na zdarzenie zakończenia/anulowania drukowania
+            window.onafterprint = function() {
+                // Zamknij okno po drukowaniu
+                window.close();
+            };
+    </script>
+    
+</body>
+</html>

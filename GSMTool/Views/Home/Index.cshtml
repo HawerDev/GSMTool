@@ -1,0 +1,64 @@
+﻿@{
+    ViewData["Title"] = "Strona główna";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Witaj w GSMTool</h1>
+
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    Sprawdź status naprawy
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <input type="text" id="serviceNumber" class="form-control" placeholder="Wprowadź numer serwisowy" />
+                    </div>
+                    <button class="btn btn-primary mt-3" onclick="checkStatus()">Sprawdź status</button>
+
+                    <div id="statusResult" class="mt-3" style="display: none;">
+                        <div class="alert" role="alert">
+                            <h5 class="alert-heading" id="statusTitle"></h5>
+                            <p id="statusDetails"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function checkStatus() {
+            const serviceNumber = document.getElementById('serviceNumber').value;
+
+            fetch('/Home/CheckStatus', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `serviceNumber=${serviceNumber}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                const statusResult = document.getElementById('statusResult');
+                const statusTitle = document.getElementById('statusTitle');
+                const statusDetails = document.getElementById('statusDetails');
+
+                statusResult.style.display = 'block';
+
+                if (data.success) {
+                    statusResult.className = 'mt-3 alert alert-success';
+                    statusTitle.textContent = `Status: ${data.status}`;
+                    statusDetails.textContent = `Model: ${data.model}, Data przyjęcia: ${data.createDate}`;
+                } else {
+                    statusResult.className = 'mt-3 alert alert-danger';
+                    statusTitle.textContent = 'Błąd';
+                    statusDetails.textContent = data.message;
+                }
+            });
+        }
+    </script>
+}

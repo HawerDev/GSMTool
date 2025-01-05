@@ -1,0 +1,59 @@
+﻿@model GSMTool.Models.User
+
+@{
+    ViewData["Title"] = "Dodaj użytkownika";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header">
+                <h4>Dodaj nowego użytkownika</h4>
+            </div>
+            <div class="card-body">
+                <form asp-controller="Admin" asp-action="CreateUser" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Username">Nazwa użytkownika</label>
+                        <input asp-for="Username" class="form-control" />
+                        <span asp-validation-for="Username" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Email">Email</label>
+                        <input asp-for="Email" class="form-control" type="email" />
+                        <span asp-validation-for="Email" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="Password">Hasło</label>
+                        <input type="password" id="Password" name="Password" class="form-control" />
+                        <span class="text-danger" id="password-error"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Role">Rola</label>
+                        <select asp-for="Role" class="form-select">
+                            <option value="">Wybierz rolę</option>
+                            <option value="User">Użytkownik</option>
+                            <option value="Administrator">Administrator</option>
+                        </select>
+                        <span asp-validation-for="Role" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group text-center">
+                        <button type="submit" class="btn btn-primary">Dodaj użytkownika</button>
+                        <a asp-action="Users" class="btn btn-secondary">Powrót do listy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

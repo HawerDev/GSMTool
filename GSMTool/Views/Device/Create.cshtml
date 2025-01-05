@@ -1,0 +1,85 @@
+﻿@model GSMTool.Models.Device
+
+@{
+    ViewData["Title"] = "Dodaj nowe urządzenie";
+}
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h4>Dodaj nowe urządzenie</h4>
+            </div>
+            <div class="card-body">
+                <form id="createDeviceForm" asp-action="Create" asp-controller="Device" method="post">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Model">Model urządzenia</label>
+                        <input asp-for="Model" class="form-control" required />
+                        <span asp-validation-for="Model" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="IMEINumber">Numer IMEI</label>
+                        <input asp-for="IMEINumber" class="form-control" required />
+                        <span asp-validation-for="IMEINumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="Description">Opis usterki</label>
+                        <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="CustomerName">Nazwa klienta</label>
+                        <input asp-for="CustomerName" class="form-control" required />
+                        <span asp-validation-for="CustomerName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label asp-for="CustomerPhone">Telefon klienta</label>
+                        <input asp-for="CustomerPhone" class="form-control" required />
+                        <span asp-validation-for="CustomerPhone" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary" id="submitButton">Zapisz</button>
+                        <a asp-action="Index" class="btn btn-secondary">Powrót do listy</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#createDeviceForm').on('submit', function (e) {
+                e.preventDefault();
+                console.log('Formularz jest wysyłany');
+
+                var formData = $(this).serialize();
+                console.log('Dane formularza:', formData);
+
+                $.ajax({
+                    url: '@Url.Action("Create", "Device")',
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        console.log('Sukces:', response);
+                        window.location.href = '@Url.Action("Index", "Device")';
+                    },
+                    error: function (error) {
+                        console.log('Błąd:', error);
+                    }
+                });
+            });
+        });
+    </script>
+}

@@ -1,0 +1,142 @@
+﻿@model IEnumerable<GSMTool.Models.Device>
+
+@{
+    ViewData["Title"] = "Lista urządzeń";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>Lista urządzeń</h2>
+    <a asp-action="Create" class="btn btn-primary">Dodaj nowe urządzenie</a>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Nr serwisowy</th>
+                <th>Model</th>
+                <th>IMEI</th>
+                <th>Klient</th>
+                <th>Status</th>
+                <th>Data przyjęcia</th>
+                <th>Akcje</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.ServiceNumber</td>
+                    <td>@item.Model</td>
+                    <td>@item.IMEINumber</td>
+                    <td>@item.CustomerName</td>
+                    <td>
+                        <select class="form-select status-select" data-device-id="@item.Id">
+                            @{
+                                var statuses = new[] { "Przyjęte na serwis", "W trakcje naprawy", "Do odbioru", "Wydane" };
+                                foreach (var status in statuses)
+                                {
+                                    if (status == item.Status)
+                                    {
+                                        <option value="@status" selected>@status</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@status">@status</option>
+                                    }
+                                }
+                            }
+                        </select>
+                    </td>
+                    <td>@item.CreatedDate.ToString("dd.MM.yyyy")</td>
+                    <td>
+                        <button class="btn btn-primary btn-sm me-2 update-status" data-id="@item.Id">
+                            Zapisz status
+                        </button>
+                        <button class="btn btn-info btn-sm print-service" data-id="@item.Id">
+                            Drukuj kartę
+                        </button>
+                        <button class="btn btn-danger btn-sm delete-device" data-id="@item.Id">
+                            Usuń
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script>s
+        $(document).ready(function () {
+            toastr.options = {
+                "closeButton": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right",
+                "timeOut": "3000"
+            };
+            $('.update-status').click(function () {
+                const button = $(this);
+                const id = button.data('id');
+                const status = button.closest('tr').find('.status-select').val();
+
+                button.prop('disabled', true)
+                    .html('<span class="spinner-border spinner-border-sm"></span>');
+
+                $.ajax({
+                    url: '@Url.Action("UpdateStatus")',
+                    type: 'POST',
+                    data: { id: id, status: status },
+                    success: function (response) {
+                        if (response.success) {
+                            toastr.success('Status został zaktualizowany pomyślnie');
+                        } else {
+                            toastr.error('Wystąpił błąd podczas aktualizacji statusu');
+                        }
+                    },
+                    error: function () {
+                        toastr.error('Wystąpił błąd podczas połączenia z serwerem');
+                    },
+                    complete: function () {
+                        button.prop('disabled', false).text('Zapisz status');
+                    }
+                });
+            });
+
+            $('.print-service').click(function () {
+                const id = $(this).data('id');
+                window.open(`@Url.Action("PrintOrder")/${id}`, '_blank');
+            });
+
+            $('.delete-device').click(function () {
+                const button = $(this);
+                const id = button.data('id');
+
+                if (confirm("Czy na pewno chcesz usunąć to urządzenie?")) {
+                    button.prop('disabled', true)
+                        .html('<span class="spinner-border spinner-border-sm"></span>');
+
+                    $.ajax({
+                        url: '@Url.Action("DeleteDevice")',
+                        type: 'POST',
+                        data: { id: id },
+                        success: function (response) {
+                            if (response.success) {
+                                toastr.success('Urządzenie zostało usunięte');
+                                button.closest('tr').remove(); 
+                            } else {
+                                toastr.error(response.message || 'Wystąpił błąd podczas usuwania urządzenia');
+                            }
+                        },
+                        error: function () {
+                            toastr.error('Wystąpił błąd podczas połączenia z serwerem');
+                        },
+                        complete: function () {
+                            button.prop('disabled', false).text('Usuń');
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+}

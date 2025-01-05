@@ -3,7 +3,7 @@
 
 GSMTool - System do zarządzania serwisem GSM
 
-
+![image alt](https://github.com/HawerDev/GSMTool/blob/master/image.png?raw=true)
 
 Krótki opis działania projektu
 

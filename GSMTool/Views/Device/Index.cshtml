@@ -67,35 +67,36 @@
 </div>
 
 @section Scripts {
-    <script>s
+    <script>
         $(document).ready(function () {
             toastr.options = {
-                "closeButton": true,
-                "progressBar": true,
-                "positionClass": "toast-top-right",
-                "timeOut": "3000"
+                closeButton: true,
+                progressBar: true,
+                positionClass: "toast-top-right",
+                timeOut: 3000,
             };
+
+            // Aktualizacja statusu urządzenia
             $('.update-status').click(function () {
                 const button = $(this);
                 const id = button.data('id');
                 const status = button.closest('tr').find('.status-select').val();
 
-                button.prop('disabled', true)
-                    .html('<span class="spinner-border spinner-border-sm"></span>');
+                button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
 
                 $.ajax({
-                    url: '@Url.Action("UpdateStatus")',
+                    url: '@Url.Action("UpdateStatus", "Device")',
                     type: 'POST',
                     data: { id: id, status: status },
                     success: function (response) {
                         if (response.success) {
                             toastr.success('Status został zaktualizowany pomyślnie');
                         } else {
-                            toastr.error('Wystąpił błąd podczas aktualizacji statusu');
+                            toastr.error(response.message || 'Błąd aktualizacji statusu');
                         }
                     },
                     error: function () {
-                        toastr.error('Wystąpił błąd podczas połączenia z serwerem');
+                        toastr.error('Błąd połączenia z serwerem');
                     },
                     complete: function () {
                         button.prop('disabled', false).text('Zapisz status');
@@ -103,33 +104,35 @@
                 });
             });
 
+            // Drukowanie karty serwisowej
             $('.print-service').click(function () {
                 const id = $(this).data('id');
-                window.open(`@Url.Action("PrintOrder")/${id}`, '_blank');
+                const printUrl = `@Url.Action("PrintOrder", "Device")/${id}`;
+                window.open(printUrl, '_blank');
             });
 
+            // Usuwanie urządzenia
             $('.delete-device').click(function () {
                 const button = $(this);
                 const id = button.data('id');
 
                 if (confirm("Czy na pewno chcesz usunąć to urządzenie?")) {
-                    button.prop('disabled', true)
-                        .html('<span class="spinner-border spinner-border-sm"></span>');
+                    button.prop('disabled', true).html('<span class="spinner-border spinner-border-sm"></span>');
 
                     $.ajax({
-                        url: '@Url.Action("DeleteDevice")',
+                        url: '@Url.Action("DeleteDevice", "Device")',
                         type: 'POST',
                         data: { id: id },
                         success: function (response) {
                             if (response.success) {
                                 toastr.success('Urządzenie zostało usunięte');
-                                button.closest('tr').remove(); 
+                                button.closest('tr').remove();
                             } else {
-                                toastr.error(response.message || 'Wystąpił błąd podczas usuwania urządzenia');
+                                toastr.error(response.message || 'Błąd podczas usuwania urządzenia');
                             }
                         },
                         error: function () {
-                            toastr.error('Wystąpił błąd podczas połączenia z serwerem');
+                            toastr.error('Błąd połączenia z serwerem');
                         },
                         complete: function () {
                             button.prop('disabled', false).text('Usuń');
@@ -140,3 +143,4 @@
         });
     </script>
 }
+
